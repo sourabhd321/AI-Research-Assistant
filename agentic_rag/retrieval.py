@@ -1,7 +1,8 @@
 from sentence_transformers import CrossEncoder
-from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 from agentic_rag.ingestion import vector_db, chunks
 from agentic_rag.state import MyState
+from langchain.retrievers import EnsembleRetriever
 
 # Set up dense and sparse retrievers
 dense_retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 20})

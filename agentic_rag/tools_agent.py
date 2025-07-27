@@ -4,6 +4,10 @@ from agentic_rag.refinement import refine_query_chain
 from agentic_rag.scoring import scorer_chain
 from agentic_rag.generation import generator_chain
 from agentic_rag.llm_config import llm
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
+
+from langchain_core.prompts import PromptTemplate
+from pydantic import BaseModel, Field
 
 def extract_field(result, field: str):
     # Handles BaseModel, dict, or message objects
@@ -15,6 +19,13 @@ def extract_field(result, field: str):
     if hasattr(result, "content"):
         return getattr(result, "content")
     return str(result)
+
+class SummarizationOutput(BaseModel):
+    summary: str = Field(description="Concise summary of the input text")
+
+summarizer_template = """You are an expert AI assistant. Summarize the following text into a clear, cohesive explanation suitable for answering a user’s question:\n\nText:\n{text}\n\nSummary:"""
+summarizer_prompt = PromptTemplate.from_template(summarizer_template)
+summarizer_chain = summarizer_prompt | llm.with_structured_output(SummarizationOutput)
 
 @tool
 def refine_query(query: str) -> str:
@@ -50,6 +61,26 @@ def score_relevance(input_text: str) -> str:
     return str(result)
 
 @tool
+def search_web(query: str) -> str:
+    """Search the web for relevant information using DuckDuckGo."""
+    ddg = DuckDuckGoSearchAPIWrapper()
+    results = ddg.run(query)
+    return results
+
+@tool
+def summarize_text(text: str) -> str:
+    """Summarize a block of text into a concise explanation."""
+    result = summarizer_chain.invoke({"text": text})
+    # # extract the summary field
+    # return getattr(result, "summary", result.get("summary", str(result)))
+    # the Pydantic model has a `.summary` attribute – return it directly
+    if hasattr(result, "summary"):
+        return result.summary
+    # fallback if something unexpected happens
+    return str(result)
+
+
+@tool
 def generate_answer(query: str, document: str) -> str:
     """Generate an answer to the user query using the provided document context."""
     result = generator_chain.invoke({"query": query, "document": document})
@@ -60,7 +91,7 @@ def generate_answer(query: str, document: str) -> str:
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 
-tools = [generate_answer, score_relevance, retrieve_docs, refine_query]
+tools = [generate_answer, score_relevance, retrieve_docs, refine_query, search_web, summarize_text]
 
 tool_list_text = "\n".join(f"- `{tool.name}`: {tool.description}" for tool in tools)
 system_message = (

@@ -13,15 +13,22 @@ def agentic_rag_node(state: MyState):
     A node that uses the tool-enabled agent to answer the user query.
     """
     prompt_text = (
-        "You are a Retrieval-Augmented Generation (RAG) agent.\n"
-        "Use the tools to:\n"
-        "- Refine the query if needed,\n"
-        "- Retrieve relevant documents from the vector DB,\n"
-        "- Score the relevance of the results.\n\n"
-        "Only output an answer if the relevance score is ≥ 0.7.\n"
-        "Retry up to 5 times if necessary.\n\n"
-        f"User query: {state['query']}"
-    )
+    "You are a Retrieval-Augmented Generation (RAG) agent.\n"
+    "Use the tools to:\n"
+    "- Refine the query if needed,\n"
+    "- Retrieve relevant documents from the vector DB,\n"
+    "- If the knowledge base does not have enough info (relevance < 0.7), use the `search_web` tool to fetch web snippets,\n"
+    "- Then use `summarize_text` to synthesize those snippets into a coherent explanation,\n"
+    "- Score the relevance of the results, and\n"
+    "- Generate a final answer.\n\n"
+    "- Only output an answer if the relevance score is ≥ 0.7 on internal docs. If not, fall back:\n"
+        "  1) call `search_web(query)`,\n"
+        "  2) call `summarize_text` on the returned snippets,\n"
+        "  3) then `generate_answer` using that summary as the document.\n"
+    "Retry up to 5 times if necessary.\n\n"
+    f"User query: {state['query']}"
+)
+
     # Run the agent with the constructed prompt
     # result = agent_executor.invoke({"input": prompt_text})
     # # The agent returns a dict with an 'output' key containing the answer
