@@ -20,7 +20,7 @@ def load_docs_with_reporting(urls):
                 failed_urls.append(url)
             else:
                 docs.extend(loaded)
-        except Exception as e:
+        except Exception:
             failed_urls.append(url)
     return docs, failed_urls
 
@@ -63,7 +63,7 @@ if 'db' in st.session_state:
 
     if st.button("Get Answer") and user_query:
         # Patch: dynamically replace your vector DB in the pipeline
-        import agentic_rag.ingestion
+        import agentic_rag.ingestion  # noqa: F401
         agentic_rag.ingestion.vector_db = st.session_state['db']
 
         state = MyState()
@@ -72,22 +72,22 @@ if 'db' in st.session_state:
         with st.spinner("Thinking..."):
             response = flow.invoke(state)
 
-        # st.markdown("**Your Question:**")
-        # st.write(user_query)
-
-        # ---- Show Refined Query (if present in response) ----
+        # ---- Show Refined Query (if present) ----
         refined_query = response.get("refined_query", "")
         if refined_query:
             st.markdown("**Refined Question:**")
             st.code(refined_query, language="text")
 
+        # ---- Show Final Answer ----
         st.markdown("**Final Answer:**")
-        st.info(response["response"])
-        
+        st.info(response.get("response", ""))
 
-        # score = response.get("score", "")
-        # if score:
-        #     st.markdown(f"**Relevance Score:** {score}")
+        # ---- Display Source Note ----
+        used_fallback = response.get("used_fallback", False)
+        if used_fallback:
+            st.warning("*Note:* This answer was sourced from Tavily search.")
+        else:
+            st.success("*Note:* This answer was sourced from the vector database.")
 
 else:
     st.warning("Please enter URLs and load documents first.")

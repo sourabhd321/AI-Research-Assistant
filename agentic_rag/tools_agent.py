@@ -8,6 +8,8 @@ from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel, Field
+from tavily import TavilyClient
+import os
 
 def extract_field(result, field: str):
     # Handles BaseModel, dict, or message objects
@@ -60,12 +62,31 @@ def score_relevance(input_text: str) -> str:
     print("SCORE TOOL FALLBACK:", str(result))
     return str(result)
 
+# @tool
+# def search_web(query: str) -> str:
+#     """Search the web for relevant information using DuckDuckGo."""
+#     ddg = DuckDuckGoSearchAPIWrapper()
+#     results = ddg.run(query)
+#     return results
+
 @tool
 def search_web(query: str) -> str:
-    """Search the web for relevant information using DuckDuckGo."""
-    ddg = DuckDuckGoSearchAPIWrapper()
-    results = ddg.run(query)
-    return results
+    """Search the web for relevant information using Tavily."""
+    client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+    # you can tweak max_results, include_answer, etc.
+    resp = client.search(
+        query=query,
+        max_results=5,
+        include_answer=False,
+        include_raw_content=True
+    )
+    # print(resp)
+    # # Tavily returns a top‐level "answer" field if available
+    # if resp.get("answer"):
+    #     return resp["answer"]
+    # otherwise, join the snippet content from results
+    snippets = [r["content"] for r in resp.get("results", [])]
+    return "\n\n".join(snippets)
 
 @tool
 def summarize_text(text: str) -> str:

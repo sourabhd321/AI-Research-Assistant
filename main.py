@@ -9,6 +9,6 @@ warnings.filterwarnings("ignore", category=FutureWarning, message="`encoder_atte
 
 # Example usage: run the RAG workflow for a sample query
 state = MyState()
-state["query"] = "Capital of France?"
+state["query"] = "What is Blackhole"
 response = flow.invoke(state)
 print("Final Answer:", response["response"])

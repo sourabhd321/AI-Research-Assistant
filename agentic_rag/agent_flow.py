@@ -1,5 +1,9 @@
 from langgraph.graph import StateGraph, START, END
-from agentic_rag.tools_agent import agent_executor
+from agentic_rag.tools_agent import (
+    agent_executor,
+    search_web,
+    generate_answer,   
+)
 from agentic_rag.state import MyState
 from agentic_rag.refinement import refined_query_generator
 
@@ -10,44 +14,57 @@ def refinement_node(state: MyState):
 
 def agentic_rag_node(state: MyState):
     """
-    A node that uses the tool-enabled agent to answer the user query.
+    A node that uses the tool-enabled agent to answer the user query,
+    falling back to web search if vector-DB relevance is low.
     """
+    # 1) Normalize & build the prompt for your tool-calling agent
+    normalized_query = state["query"].replace("-", " ").strip()
     prompt_text = (
-    "You are a Retrieval-Augmented Generation (RAG) agent.\n"
-    "Use the tools to:\n"
-    "- Refine the query if needed,\n"
-    "- Retrieve relevant documents from the vector DB,\n"
-    "- If the knowledge base does not have enough info (relevance < 0.7), use the `search_web` tool to fetch web snippets,\n"
-    "- Then use `summarize_text` to synthesize those snippets into a coherent explanation,\n"
-    "- Score the relevance of the results, and\n"
-    "- Generate a final answer.\n\n"
-    "- Only output an answer if the relevance score is ≥ 0.7 on internal docs. If not, fall back:\n"
-        "  1) call `search_web(query)`,\n"
-        "  2) call `summarize_text` on the returned snippets,\n"
-        "  3) then `generate_answer` using that summary as the document.\n"
-    "Retry up to 5 times if necessary.\n\n"
-    f"User query: {state['query']}"
-)
+        "You are a Retrieval-Augmented Generation (RAG) agent.\n"
+        "Use the tools to:\n"
+        "- Refine the query,\n"
+        "- Retrieve relevant documents from the vector DB,\n"
+        "- If the knowledge base does not have enough info (relevance < 0.5), use `search_web`,\n"
+        "- Finally, generate an answer.\n\n"
+        f"User query: {normalized_query}"
+    )
 
-    # Run the agent with the constructed prompt
-    # result = agent_executor.invoke({"input": prompt_text})
-    # # The agent returns a dict with an 'output' key containing the answer
-    # return {"response": result["output"]}
+    # 2) Invoke the agent
     result = agent_executor.invoke({"input": prompt_text})
 
-    score = ""
-    if "intermediate_steps" in result:
-        for action, observation in result["intermediate_steps"]:
-            # action is the tool call; observation is the result (what your tool returned)
-            if getattr(action, "tool", None) == "score_relevance":
-                score = observation
+    # 3) Pull out the relevance score
+    score = 0.0
+    for action, observation in result.get("intermediate_steps", []):
+        if getattr(action, "tool", None) == "score_relevance":
+            try:
+                score = float(observation)
+            except:
+                score = 0.0
+
+    # ─── 4) FALLBACK: If internal score is low, go to web search ────────────────────
+    if score < 0.5:
+        raw_snippets  = search_web.invoke({"query": normalized_query})
+        direct_answer = generate_answer.invoke({
+            "query":    normalized_query,
+            "document": raw_snippets,
+        })
+        return {
+            "response":      direct_answer,
+            "refined_query": state.get("refined_query", ""),
+            "score":         score,
+            "used_fallback": True,
+        }
+
+    # ─── 5) Otherwise, return the agent’s original RAG answer ────────────────────────
     return {
-        "response": result["output"],
+        "response":      result.get("output", ""),
         "refined_query": state.get("refined_query", ""),
-        "score": score
+        "score":         score,
+        "used_fallback": False,
     }
 
-# Build the StateGraph for the workflow (single-node agentic approach)
+
+# Build the StateGraph for the workflow
 graph = StateGraph(MyState)
 graph.add_node("refinement", refinement_node)
 graph.add_node("agentic", agentic_rag_node)
@@ -55,4 +72,5 @@ graph.add_edge(START, "refinement")
 graph.add_edge("refinement", "agentic")
 graph.add_edge("agentic", END)
 flow = graph.compile()
+
 print(flow)

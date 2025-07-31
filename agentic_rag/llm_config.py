@@ -7,7 +7,7 @@ from typing import cast
 load_dotenv()
 
 # Access the key and model name
-google_api_key = os.getenv("GOOGLE_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY_NEW")
 google_model_name = os.getenv("GOOGLE_MODEL_NAME")
 
 print("API KEY:", google_api_key)
@@ -18,5 +18,7 @@ print("MODEL NAME:", google_model_name)
 llm = ChatGoogleGenerativeAI(
     model=google_model_name,
     api_key=google_api_key,
+    temperature=0.0,
     convert_system_message_to_human=True
 )
+
