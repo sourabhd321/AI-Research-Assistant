@@ -22,7 +22,7 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 
 ## 📂 Project Structure
 
-'''ai_research_assistant/
+```ai_research_assistant/
 │── agentic_rag/
 │ │── agent_flow.py # Defines LangGraph state machine and agent workflow
 │ │── ddg_check.py # DuckDuckGo search helper for external knowledge retrieval
@@ -39,7 +39,8 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 │── main.py # CLI entry point for running pipeline
 │── rag_streamlit_app.py # Streamlit web app for interactive research assistant
 │── .gitignore # Git ignore rules
-│── README.md # Project documentation'''
+│── README.md # Project documentation
+```
 
 
 ---
@@ -57,19 +58,26 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 ## 🛠️ Setup
 
 1. Clone the repo:  
-   ```bash
+   ```
    git clone https://github.com/sourabhd321/ai-research-assistant.git
    cd ai-research-assistant
+   ```
 
 Create and activate virtual environment:
-
+```
 python -m venv venv
 source venv/bin/activate   # Linux/Mac
 venv\Scripts\activate      # Windows
-
+```
+Install dependencies:
+```
 pip install -r requirements.txt
+```
 
+Set up environment variables in .env:
+```
 GOOGLE_API_KEY=your_gemini_key
+```
 
 ▶️ Usage
 
@@ -82,6 +90,7 @@ streamlit run rag_streamlit_app.py
 
 🏗️ Architecture
 
+```
 flowchart TD
     A[📂 Ingestion] -->|Load docs, build FAISS| B[🔍 Retrieval]
     B -->|Hybrid: BM25 + Dense| C[⚖️ Reranking]
@@ -94,7 +103,7 @@ flowchart TD
     %% UI paths
     H -->|Display| I[🖥️ Streamlit App]
     E -->|CLI mode| J[💻 main.py]
-
+```
 ## Authors
 
 - [@sourabhd321](https://github.com/sourabhd321)
