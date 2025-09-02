@@ -24,22 +24,22 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 
 ```ai_research_assistant/
 │── agentic_rag/
-│ │── agent_flow.py # Defines LangGraph state machine and agent workflow
-│ │── ddg_check.py # DuckDuckGo search helper for external knowledge retrieval
-│ │── generation.py # Handles LLM response generation using Gemini
-│ │── ingestion.py # Ingests documents and builds FAISS vector store
-│ │── init.py # Marks directory as a Python package
-│ │── llm_config.py # Centralized config for Gemini and other LLMs
-│ │── refinement.py # Query reformulation and refinement logic
-│ │── retrieval.py # Hybrid (BM25 + dense) retrieval with reranking
-│ │── scoring.py # Implements self-critique and scoring of answers
-│ │── state.py # LangGraph state definitions and transitions
-│ │── tools_agent.py # Utility tools exposed to the agent (search, calculators, etc.)
+│ │── agent_flow.py        # Defines LangGraph state machine and agent workflow
+│ │── ddg_check.py         # DuckDuckGo search helper for external knowledge retrieval
+│ │── generation.py        # Handles LLM response generation using Gemini
+│ │── ingestion.py         # Ingests documents and builds FAISS vector store
+│ │── init.py              # Marks directory as a Python package
+│ │── llm_config.py        # Centralized config for Gemini and other LLMs
+│ │── refinement.py        # Query reformulation and refinement logic
+│ │── retrieval.py         # Hybrid (BM25 + dense) retrieval with reranking
+│ │── scoring.py           # Implements self-critique and scoring of answers
+│ │── state.py             # LangGraph state definitions and transitions
+│ │── tools_agent.py       # Utility tools exposed to the agent (search, calculators, etc.)
 │
-│── main.py # CLI entry point for running pipeline
-│── rag_streamlit_app.py # Streamlit web app for interactive research assistant
-│── .gitignore # Git ignore rules
-│── README.md # Project documentation
+│── main.py                # CLI entry point for running pipeline
+│── rag_streamlit_app.py   # Streamlit web app for interactive research assistant
+│── .gitignore             # Git ignore rules
+│── README.md              # Project documentation
 ```
 
 
