@@ -22,7 +22,7 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 
 ## 📂 Project Structure
 
-ai_research_assistant/
+'''ai_research_assistant/
 │── agentic_rag/
 │ │── agent_flow.py # Defines LangGraph state machine and agent workflow
 │ │── ddg_check.py # DuckDuckGo search helper for external knowledge retrieval
@@ -39,7 +39,7 @@ ai_research_assistant/
 │── main.py # CLI entry point for running pipeline
 │── rag_streamlit_app.py # Streamlit web app for interactive research assistant
 │── .gitignore # Git ignore rules
-│── README.md # Project documentation
+│── README.md # Project documentation'''
 
 
 ---
