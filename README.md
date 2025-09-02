@@ -59,7 +59,7 @@ On top of the pipeline, a **Streamlit web app** (`rag_streamlit_app.py`) provide
 
 1. Clone the repo:  
    ```
-   git clone https://github.com/sourabhd321/ai-research-assistant.git
+   git clone https://github.com/sourabhd321/AI-Research-Assistant.git
    cd ai-research-assistant
    ```
 
