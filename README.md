@@ -96,17 +96,18 @@ streamlit run rag_streamlit_app.py
 
 ```mermaid
 flowchart TD
-    A[📂 Ingestion] -->|Load docs, build FAISS| B[🔍 Retrieval]
-    B -->|Hybrid: BM25 + Dense| C[⚖️ Reranking]
-    C --> D[🔧 Refinement]
-    D --> E[🤖 Agent Flow (LangGraph)]
-    E --> F[✍️ Generation (LLM - Gemini)]
-    F --> G[⭐ Scoring & Self-Critique]
-    G --> H[🎯 Final Answer]
+    A[Ingestion] -->|Load docs, build FAISS| B[Retrieval]
+    B -->|Hybrid: BM25 + Dense| C[Reranking]
+    C --> D[Refinement]
+    D --> E["Agent Flow (LangGraph)"]
+    E --> F["Generation (LLM - Gemini)"]
+    F --> G["Scoring & Self-Critique"]
+    G --> H["Final Answer"]
 
     %% UI paths
-    H -->|Display| I[🖥️ Streamlit App]
-    E -->|CLI mode| J[💻 main.py]
+    H -->|Display| I["Streamlit App"]
+    E -->|CLI mode| J["main.py"]
+
 ```
 ## Authors
 
