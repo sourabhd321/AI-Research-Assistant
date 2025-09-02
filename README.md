@@ -94,7 +94,7 @@ streamlit run rag_streamlit_app.py
 
 🏗️ Architecture
 
-```
+```mermaid
 flowchart TD
     A[📂 Ingestion] -->|Load docs, build FAISS| B[🔍 Retrieval]
     B -->|Hybrid: BM25 + Dense| C[⚖️ Reranking]
