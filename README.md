@@ -82,10 +82,14 @@ GOOGLE_API_KEY=your_gemini_key
 ▶️ Usage
 
 Run the pipeline (CLI mode)
+```
 python main.py
+```
 
 Run the Streamlit app (UI mode)
+```
 streamlit run rag_streamlit_app.py
+```
 
 
 🏗️ Architecture
